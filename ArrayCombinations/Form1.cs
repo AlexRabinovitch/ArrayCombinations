@@ -28,17 +28,22 @@ namespace ArrayCombinations
         {
             ClearLog();
 
-            string[] strInput = txtInput.Text.Split(',');
-            _input = Array.ConvertAll(strInput, element => double.Parse(element));
+            _input = SplitInputToDoubleArray(txtInput.Text);
+
+            //string[] strInput = txtInput.Text.Split(',');
+            //_input = Array.ConvertAll(strInput, element => double.Parse(element));
+            
             _sums = new List<double>();
 
-            string[] strMandatoryInput = null;
-            if(txtMandatory.Text!= string.Empty)
-                strMandatoryInput = txtMandatory.Text.Split(',');
+            //string[] strMandatoryInput = null;
+            //if(txtMandatory.Text!= string.Empty)
+            //    strMandatoryInput = txtMandatory.Text.Split(',');
 
-            double[] mandatoryInput = null;
-            if (strMandatoryInput !=null && strMandatoryInput.Length > 0)
-                mandatoryInput = Array.ConvertAll(strMandatoryInput, element => double.Parse(element));
+            //double[] mandatoryInput = null;
+            //if (strMandatoryInput !=null && strMandatoryInput.Length > 0)
+            //    mandatoryInput = Array.ConvertAll(strMandatoryInput, element => double.Parse(element));
+
+            double[] mandatoryInput = SplitInputToDoubleArray(txtMandatory.Text); ;
 
             _minSum = (double)nudMinSum.Value;
 
@@ -80,6 +85,24 @@ namespace ArrayCombinations
                 AppendMessage("**************************");
             }
             EndMessage();
+        }
+
+        private double[] SplitInputToDoubleArray(string strInput)
+        {
+            string[] arrStrInput = null;
+            if (strInput != string.Empty)
+            {
+                if(strInput.Contains(","))
+                    arrStrInput = strInput.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                else if(strInput.Contains(Environment.NewLine))
+                    arrStrInput = strInput.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            double[] arrInput = null;
+            if (arrStrInput != null && arrStrInput.Length > 0)
+                arrInput = Array.ConvertAll(arrStrInput, element => double.Parse(element));
+
+            return arrInput;
         }
 
         private List<PackSet> ProcessMandatoryNumbers(double[] mandatoryInput)
@@ -124,11 +147,12 @@ namespace ArrayCombinations
 
         private void GetAllPacks(List<double> lstInput, List<Pack> lstPacks)
         {
-            List<Pack> result = GetAllCombos(lstInput);
+            List<Pack> lstResult = GetAllCombos(lstInput);
 
-            result = result.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
+            IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
 
-            foreach(Pack pack in result)
+            foreach(Pack pack in filteredResult)
+            //Parallel.ForEach(result, pack =>
             {
                 //lstPacks.Add(new List<Pack>());
                 //lstPacks.Last().Add(pack);
@@ -138,13 +162,14 @@ namespace ArrayCombinations
                 lstNewPacks.Add(pack);
 
                 List<double> lstInputTrimmed = new List<double>(lstInput);
-                foreach(double sum in pack.Sums)
+                foreach (double sum in pack.Sums)
                     lstInputTrimmed.Remove(sum);
 
                 GetAllPacks(lstInputTrimmed, lstNewPacks);
+            //});
             }
 
-            if(result.Count == 0)
+            if(filteredResult.Count() == 0)
             {
                 _packs.Add(new PackSet { Packs = lstPacks });
             }
