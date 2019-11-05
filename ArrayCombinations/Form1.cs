@@ -159,8 +159,9 @@ namespace ArrayCombinations
             List<Pack> lstResult = GetAllCombos(lstInput);
 
             IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
+            //IEnumerable<Pack> filteredResult = lstResult.Distinct().OrderByDescending(elm => elm.Sum).ToList();
 
-            foreach(Pack pack in filteredResult)
+            foreach (Pack pack in filteredResult)
             //Parallel.ForEach(result, pack =>
             {
                 //lstPacks.Add(new List<Pack>());
@@ -215,8 +216,11 @@ namespace ArrayCombinations
                         }
                     }
                 }
-                if(isRelevantPack)
-                    result.Add(pack);
+                //if(pack.Sum >= _minSum)
+                //{
+                    if (isRelevantPack)
+                        result.Add(pack);
+                //}
             }
             return result;
         }
@@ -298,26 +302,75 @@ namespace ArrayCombinations
         }
     }
 
+    class SumList : List<double>
+    {
+        public SumList() : base()
+        {
+        }
+
+        public double Sum { get; private set; }
+        public new void Add(double item)
+        {
+            base.Add(item);
+            Sum += item;
+        }
+
+        public new void AddRange(IEnumerable<double> collection)
+        {
+            base.AddRange(collection);
+            Sum = this.Sum();
+        }
+
+        public new bool Remove(double item)
+        {
+            bool result = base.Remove(item);
+            if (result)
+                Sum -= item;
+
+            return result;
+        }
+
+        public new int RemoveAll(Predicate<double> match)
+        {
+            int result = base.RemoveAll(match);
+            Sum = this.Sum();
+            return result;
+        }
+
+        public new void RemoveAt(int index)
+        {
+            base.RemoveAt(index);
+            Sum = this.Sum();
+        }
+
+        public new void RemoveRange(int index, int count)
+        {
+            base.RemoveRange(index, count);
+            Sum = this.Sum();
+        }
+    }
+
     class Pack : IEquatable<Pack>
     {
         public double Sum
         {
             get
             {
-                return Sums.Sum();
+                //return Sums.Sum();
+                return Sums.Sum;
             }
         }
 
 
         public List<int> Numbers { get; set; }
 
-        public List<double> Sums { get; set; }
+        public SumList Sums { get; set; }
 
         public Pack()
         {
             //Sum = 0;
             Numbers = new List<int>();
-            Sums = new List<double>();
+            Sums = new SumList();
         }
 
         public override bool Equals(object other)
