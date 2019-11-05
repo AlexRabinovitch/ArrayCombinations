@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -47,7 +48,7 @@ namespace ArrayCombinations
 
             _minSum = (double)nudMinSum.Value;
 
-            LogMessage("Starting to work on " + _input.Length + " numbers. Sum = " + _input.Sum());
+            LogMessage($"Starting to work on {_input.Length} numbers. Sum = {_input.Sum()}");
 
             //int numOfIterations = Convert.ToInt32(Math.Floor(_input.Sum() / 75));
 
@@ -56,7 +57,15 @@ namespace ArrayCombinations
             //_packs = new List<List<Pack>>();
             _packs = new List<PackSet>();
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             GetAllPacks(lstInput, new List<Pack>());
+
+            sw.Stop();
+            long elapsedSeconds = sw.ElapsedMilliseconds / 1000;
+
+            LogMessage($"GetAllPacks time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
 
             _packs = ProcessMandatoryNumbers(mandatoryInput);
 
@@ -186,12 +195,28 @@ namespace ArrayCombinations
             for (int i = 1; i < comboCount + 1; i++)
             {
                 // make each combo here
-                result.Add(new Pack());
+                Pack pack = new Pack();
+                bool isRelevantPack = true;
+                //result.Add(new Pack());
                 for (int j = 0; j < list.Count; j++)
                 {
                     if ((i >> j) % 2 != 0)
-                        result.Last().Sums.Add(list[j]);
+                    {
+                        //result.Last().Sums.Add(list[j]);
+                        double currentSum = list[j];
+                        if (pack.Sum + currentSum <= 75)
+                        {
+                            pack.Sums.Add(currentSum);
+                        }
+                        else
+                        {
+                            isRelevantPack = false;
+                            break;
+                        }
+                    }
                 }
+                if(isRelevantPack)
+                    result.Add(pack);
             }
             return result;
         }
