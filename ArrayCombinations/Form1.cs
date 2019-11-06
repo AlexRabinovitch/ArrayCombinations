@@ -158,8 +158,8 @@ namespace ArrayCombinations
         {
             List<Pack> lstResult = GetAllCombos(lstInput);
 
-            IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
-            //IEnumerable<Pack> filteredResult = lstResult.Distinct().OrderByDescending(elm => elm.Sum).ToList();
+            //IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
+            IEnumerable<Pack> filteredResult = lstResult.Distinct().OrderByDescending(elm => elm.Sum).ToList();
 
             foreach (Pack pack in filteredResult)
             //Parallel.ForEach(result, pack =>
@@ -216,11 +216,11 @@ namespace ArrayCombinations
                         }
                     }
                 }
-                //if(pack.Sum >= _minSum)
-                //{
+                if(pack.Sum >= _minSum)
+                {
                     if (isRelevantPack)
                         result.Add(pack);
-                //}
+                }
             }
             return result;
         }
@@ -460,10 +460,13 @@ namespace ArrayCombinations
 
         private bool ArePacksEqual(Pack thisPack, Pack otherPack)
         {
+            if (thisPack.Sum != otherPack.Sum)
+                return false;
+
             if (thisPack.Sums.Count != otherPack.Sums.Count)
                 return false;
 
-            for(int i = 0; i < thisPack.Sums.Count; i++)
+            for (int i = 0; i < thisPack.Sums.Count; i++)
             {
                 if (thisPack.Sums[i] != otherPack.Sums[i])
                     return false;
