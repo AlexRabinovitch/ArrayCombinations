@@ -31,18 +31,7 @@ namespace ArrayCombinations
 
             _input = SplitInputToDoubleArray(txtInput.Text);
 
-            //string[] strInput = txtInput.Text.Split(',');
-            //_input = Array.ConvertAll(strInput, element => double.Parse(element));
-            
             _sums = new List<double>();
-
-            //string[] strMandatoryInput = null;
-            //if(txtMandatory.Text!= string.Empty)
-            //    strMandatoryInput = txtMandatory.Text.Split(',');
-
-            //double[] mandatoryInput = null;
-            //if (strMandatoryInput !=null && strMandatoryInput.Length > 0)
-            //    mandatoryInput = Array.ConvertAll(strMandatoryInput, element => double.Parse(element));
 
             double[] mandatoryInput = SplitInputToDoubleArray(txtMandatory.Text); ;
 
@@ -54,7 +43,6 @@ namespace ArrayCombinations
 
             List<double> lstInput = _input.ToList();
 
-            //_packs = new List<List<Pack>>();
             _packs = new List<PackSet>();
 
             Stopwatch sw = new Stopwatch();
@@ -65,12 +53,19 @@ namespace ArrayCombinations
             sw.Stop();
             long elapsedSeconds = sw.ElapsedMilliseconds / 1000;
 
-            LogMessage($"GetAllPacks time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
+            LogMessage($"GetAllPacks() time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
 
             _packs = ProcessMandatoryNumbers(mandatoryInput);
 
-            //_packs = _packs.OrderByDescending(elm => elm.Sum(item => item.Sum)).ToList();
+            sw.Reset();
+            sw.Start();
+
             _packs = _packs.Distinct().ToList();
+
+            sw.Stop();
+            elapsedSeconds = sw.ElapsedMilliseconds / 1000;
+
+            LogMessage($"Distinct() time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
 
             if (rbSum.Checked)
             {
