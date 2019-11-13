@@ -376,14 +376,14 @@ namespace ArrayCombinations
         }
 
 
-        public List<int> Numbers { get; set; }
+        //public List<int> Numbers { get; set; }
 
         public SumList Sums { get; set; }
 
         public Pack()
         {
             //Sum = 0;
-            Numbers = new List<int>();
+            //Numbers = new List<int>();
             Sums = new SumList();
         }
 
@@ -422,20 +422,33 @@ namespace ArrayCombinations
 
     class PackSet : IEquatable<PackSet>
     {
-        public List<Pack> Packs { get; set; }
-
-        public double Sum
-        {
-            get
-            {
-                return Packs.Sum(elm => elm.Sum);
-            }
-        }
-
         public PackSet()
         {
             Packs = new List<Pack>();
         }
+
+        private List<Pack> _packs;
+
+        public List<Pack> Packs// { get; set; }
+        {
+            get
+            {
+                return _packs;
+            }
+            set
+            {
+                _packs = value;
+                Sum = _packs.Sum(elm => elm.Sum);
+            }
+        }
+
+        public double Sum { get; private set; }
+        //{
+        //    get
+        //    {
+        //        return Packs.Sum(elm => elm.Sum);
+        //    }
+        //}
 
         public override bool Equals(object obj)
         {
