@@ -45,6 +45,9 @@ namespace ArrayCombinations
 
             _packs = new List<PackSet>();
 
+            Stopwatch swTotal = new Stopwatch();
+            swTotal.Start();
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -64,8 +67,10 @@ namespace ArrayCombinations
 
             sw.Stop();
             elapsedSeconds = sw.ElapsedMilliseconds / 1000;
-
             LogMessage($"Distinct() time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
+
+            sw.Reset();
+            sw.Start();
 
             if (rbSum.Checked)
             {
@@ -75,6 +80,12 @@ namespace ArrayCombinations
             {
                 _packs = _packs.OrderBy(elm => ((elm.Packs.Count * 75) % elm.Sum)).ToList();
             }
+            sw.Stop();
+            elapsedSeconds = sw.ElapsedMilliseconds / 1000;
+            LogMessage($"Ordering time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
+
+            sw.Reset();
+            sw.Start();
 
             StartMessage();
 
@@ -88,6 +99,14 @@ namespace ArrayCombinations
 
                 AppendMessage("**************************");
             }
+            sw.Stop();
+            elapsedSeconds = sw.ElapsedMilliseconds / 1000;
+            LogMessage($"Message building time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
+
+            swTotal.Stop();
+            elapsedSeconds = swTotal.ElapsedMilliseconds / 1000;
+            LogMessage($"Total time: {elapsedSeconds} seconds");
+
             EndMessage();
         }
 
@@ -455,10 +474,10 @@ namespace ArrayCombinations
 
         private bool ArePacksEqual(Pack thisPack, Pack otherPack)
         {
-            if (thisPack.Sum != otherPack.Sum)
+            if (thisPack.Sums.Count != otherPack.Sums.Count)
                 return false;
 
-            if (thisPack.Sums.Count != otherPack.Sums.Count)
+            if (thisPack.Sum != otherPack.Sum)
                 return false;
 
             for (int i = 0; i < thisPack.Sums.Count; i++)
