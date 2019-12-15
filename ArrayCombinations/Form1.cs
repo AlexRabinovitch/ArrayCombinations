@@ -33,7 +33,10 @@ namespace ArrayCombinations
 
             _sums = new List<double>();
 
-            double[] mandatoryInput = SplitInputToDoubleArray(txtMandatory.Text); ;
+            double[] mandatoryInput = SplitInputToDoubleArray(txtMandatory.Text);
+
+            // This is in order to handle cases when the same number appears more than once in the mandatory list
+            List<List<double>> lstMandatory = PrepareMandatorySums(mandatoryInput);
 
             _minSum = (double)nudMinSum.Value;
 
@@ -58,7 +61,7 @@ namespace ArrayCombinations
 
             LogMessage($"GetAllPacks() time: {elapsedSeconds} seconds, packs number: {_packs.Count}");
 
-            _packs = ProcessMandatoryNumbers(mandatoryInput);
+            _packs = ProcessMandatoryNumbers(lstMandatory);
 
             sw.Reset();
             sw.Start();
@@ -128,29 +131,48 @@ namespace ArrayCombinations
             return arrInput;
         }
 
-        private List<PackSet> ProcessMandatoryNumbers(double[] mandatoryInput)
+        private List<List<double>> PrepareMandatorySums(double[] mandatoryInput)
         {
-            if (mandatoryInput == null || mandatoryInput.Length <= 0)
+            List<double> lstDistinctMandatory = mandatoryInput.Distinct().ToList();
+
+            List<List<double>> lstMandatory = new List<List<double>>();
+
+            foreach(double distinctSum in lstDistinctMandatory)
+            {
+                lstMandatory.Add(mandatoryInput.Where(elm => elm == distinctSum).ToList());
+            }
+
+            return lstMandatory;
+        }
+
+        private List<PackSet> ProcessMandatoryNumbers(List<List<double>> lstMandatory)
+        {
+            if (lstMandatory == null || lstMandatory.Count <= 0)
                 return _packs;
 
             List<PackSet> lstPacks = new List<PackSet>();
 
             foreach(PackSet packSet in _packs)
             {
-                if (PackSetHasAllMandatory(packSet, mandatoryInput))
+                if (PackSetHasAllMandatory(packSet, lstMandatory))
                     lstPacks.Add(packSet);
             }
 
             return lstPacks;
         }
 
-        private bool PackSetHasAllMandatory(PackSet packSet, double[] mandatoryInput)
+        private bool PackSetHasAllMandatory(PackSet packSet, List<List<double>> lstMandatory)
         {
-            foreach(double sum in mandatoryInput)
+            foreach(List<double> mandatorySum in lstMandatory)
             {
                 bool found = false;
 
-                foreach(Pack pack in packSet.Packs)
+                int count = packSet.Sums.Count(elm => elm == mandatorySum[0]);
+
+                if (count < mandatorySum.Count)
+                    return false;
+
+                /*foreach (Pack pack in packSet.Packs)
                 {
                     if (pack.Sums.Contains(sum))
                     {
@@ -163,6 +185,7 @@ namespace ArrayCombinations
                     return false;
                 else
                     found = false;
+                    */
             }
 
             return true;
@@ -425,6 +448,7 @@ namespace ArrayCombinations
         public PackSet()
         {
             Packs = new List<Pack>();
+            Sums = new List<double>();
         }
 
         private List<Pack> _packs;
@@ -439,6 +463,7 @@ namespace ArrayCombinations
             {
                 _packs = value;
                 Sum = _packs.Sum(elm => elm.Sum);
+                PrepareSums();
             }
         }
 
@@ -449,6 +474,20 @@ namespace ArrayCombinations
         //        return Packs.Sum(elm => elm.Sum);
         //    }
         //}
+
+        public List<double> Sums { get; private set; }
+
+        private void PrepareSums()
+        {
+            IEnumerable<double> lstSums = new List<double>();
+
+            foreach(Pack pack in Packs)
+            {
+                lstSums = lstSums.Concat(pack.Sums);
+            }
+
+            Sums = lstSums.ToList();
+        }
 
         public override bool Equals(object obj)
         {
