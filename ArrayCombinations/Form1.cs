@@ -120,7 +120,7 @@ namespace ArrayCombinations
             {
                 if(strInput.Contains(","))
                     arrStrInput = strInput.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                else if(strInput.Contains(Environment.NewLine))
+                else
                     arrStrInput = strInput.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             }
 
