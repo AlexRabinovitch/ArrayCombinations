@@ -133,6 +133,9 @@ namespace ArrayCombinations
 
         private List<List<double>> PrepareMandatorySums(double[] mandatoryInput)
         {
+            if (mandatoryInput == null)
+                return null;
+
             List<double> lstDistinctMandatory = mandatoryInput.Distinct().ToList();
 
             List<List<double>> lstMandatory = new List<List<double>>();
