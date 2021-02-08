@@ -24,6 +24,7 @@ namespace ArrayCombinations
         //List<List<Pack>> _packs = null;
         List<PackSet> _packs = null;
         StringBuilder _logSB = null;
+        const double MAX_PARCEl_SUM = 75;
 
         private void Button1_Click(object sender, EventArgs e)
         {
@@ -42,7 +43,7 @@ namespace ArrayCombinations
 
             LogMessage($"Starting to work on {_input.Length} numbers. Sum = {_input.Sum()}");
 
-            //int numOfIterations = Convert.ToInt32(Math.Floor(_input.Sum() / 75));
+            //int numOfIterations = Convert.ToInt32(Math.Floor(_input.Sum() / MAX_PARCEl_SUM));
 
             List<double> lstInput = _input.ToList();
 
@@ -81,7 +82,7 @@ namespace ArrayCombinations
             }
             else
             {
-                _packs = _packs.OrderBy(elm => ((elm.Packs.Count * 75) % elm.Sum)).ToList();
+                _packs = _packs.OrderBy(elm => ((elm.Packs.Count * MAX_PARCEl_SUM) % elm.Sum)).ToList();
             }
             sw.Stop();
             elapsedSeconds = sw.ElapsedMilliseconds / 1000;
@@ -198,7 +199,7 @@ namespace ArrayCombinations
         {
             List<Pack> lstResult = GetAllCombos(lstInput);
 
-            //IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= 75 && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
+            //IEnumerable<Pack> filteredResult = lstResult.Where(elm => (elm.Sum <= MAX_PARCEl_SUM && elm.Sum >= _minSum)).Distinct().OrderByDescending(elm => elm.Sum).ToList();
             IEnumerable<Pack> filteredResult = lstResult.Distinct().OrderByDescending(elm => elm.Sum).ToList();
 
             foreach (Pack pack in filteredResult)
@@ -245,7 +246,7 @@ namespace ArrayCombinations
                     {
                         //result.Last().Sums.Add(list[j]);
                         double currentSum = list[j];
-                        if (pack.Sum + currentSum <= 75)
+                        if (pack.Sum + currentSum <= MAX_PARCEl_SUM)
                         {
                             pack.Sums.Add(currentSum);
                         }
